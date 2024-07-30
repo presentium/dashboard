@@ -16,17 +16,12 @@ const links = [{
 }, {
   label: 'Documentation',
   icon: 'i-heroicons-book-open',
-  to: 'https://ui.nuxt.com/pro/getting-started',
+  to: 'https://docs.presentium.ch/',
   target: '_blank',
 }, {
-  label: 'GitHub repository',
+  label: 'GitHub Organisation',
   icon: 'i-simple-icons-github',
-  to: 'https://github.com/nuxt-ui-pro/dashboard',
-  target: '_blank',
-}, {
-  label: 'Buy Nuxt UI Pro',
-  icon: 'i-heroicons-credit-card',
-  to: 'https://ui.nuxt.com/pro/purchase',
+  to: 'https://github.com/presentium',
   target: '_blank',
 }]
 
@@ -42,15 +37,8 @@ const categories = computed(() => [{
   title: 'Navigation',
   items: [
     { shortcuts: ['G', 'H'], name: 'Go to Home' },
-    { shortcuts: ['G', 'I'], name: 'Go to Inbox' },
     { shortcuts: ['G', 'U'], name: 'Go to Users' },
     { shortcuts: ['G', 'S'], name: 'Go to Settings' },
-  ],
-}, {
-  title: 'Inbox',
-  items: [
-    { shortcuts: ['↑'], name: 'Prev notification' },
-    { shortcuts: ['↓'], name: 'Next notification' },
   ],
 }])
 
