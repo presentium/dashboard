@@ -1,5 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import process from 'node:process'
+import { env } from 'node:process'
 
 export default defineNuxtConfig({
   extends: ['@nuxt/ui-pro'],
@@ -18,13 +18,13 @@ export default defineNuxtConfig({
     defaultProvider: 'oidc',
     providers: {
       oidc: {
-        clientId: process.env.AUTH_OIDC_CLIENT_ID,
-        clientSecret: process.env.AUTH_OIDC_CLIENT_SECRET,
-        authorizationUrl: process.env.AUTH_OIDC_PROVIDER_AUTHORIZE_URL,
-        tokenUrl: process.env.AUTH_OIDC_PROVIDER_TOKEN_URL,
-        userinfoUrl: process.env.AUTH_OIDC_PROVIDER_USERINFO_URL,
-        logoutUrl: process.env.AUTH_OIDC_PROVIDER_LOGOUT_URL,
-        redirectUri: `${process.env.NUXT_PUBLIC_SITE_URL}/auth/oidc/callback`,
+        clientId: env.AUTH_OIDC_CLIENT_ID ?? '',
+        clientSecret: env.AUTH_OIDC_CLIENT_SECRET ?? '',
+        authorizationUrl: env.AUTH_OIDC_PROVIDER_AUTHORIZE_URL ?? '',
+        tokenUrl: env.AUTH_OIDC_PROVIDER_TOKEN_URL ?? '',
+        userinfoUrl: env.AUTH_OIDC_PROVIDER_USERINFO_URL,
+        logoutUrl: env.AUTH_OIDC_PROVIDER_LOGOUT_URL,
+        redirectUri: `${env.NUXT_PUBLIC_SITE_URL}/auth/oidc/callback`,
         tokenRequestType: 'form-urlencoded',
         scope: ['openid', 'profile', 'roles'],
         state: true,
@@ -42,7 +42,7 @@ export default defineNuxtConfig({
       api: {
         // NOTE: here it is intentional to path through /api, since we are using a proxy to the API server, which
         // appends the user access token to the requests for authentication.
-        baseURL: `${process.env.NUXT_PUBLIC_SITE_URL}/api/v1`,
+        baseURL: `${env.NUXT_PUBLIC_SITE_URL}/api/v1`,
         schema: '../openapi/api-docs-v1.json',
       },
     },
@@ -50,7 +50,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.API_BASE_URL,
+      apiBaseUrl: env.API_BASE_URL,
     },
   },
 
@@ -65,32 +65,16 @@ export default defineNuxtConfig({
   },
 
   ui: {
-    icons: ['heroicons', 'simple-icons', 'solar'],
     safelistColors: ['primary', 'red', 'orange', 'green'],
   },
 
   colorMode: {
-    disableTransition: true,
+    disableTransition: false,
   },
 
-  routeRules: {
-    // Temporary workaround for prerender regression. see https://github.com/nuxt/nuxt/issues/27490
-    '/': { prerender: true },
-  },
-
-  devtools: {
-    enabled: true,
-  },
-
-  typescript: {
-    strict: false,
-  },
-
-  eslint: {
-    config: {
-      standalone: false,
-    },
-  },
+  typescript: { strict: false },
+  eslint: { config: { standalone: false } },
+  devtools: { enabled: true },
 
   future: { compatibilityVersion: 4 },
   compatibilityDate: '2024-07-11',

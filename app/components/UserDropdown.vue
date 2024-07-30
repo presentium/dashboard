@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import type { UserViewModel } from '~/types/api'
+
+const { user } = defineProps<{
+  user: UserViewModel
+}>()
+
+const avatarUrl = computed(() => user ? `https://api.multiavatar.com/${user.username}.svg` : null)
+const { logout } = useOidcAuth()
+
 const { isHelpSlideoverOpen } = useDashboard()
 const { isDashboardSearchModalOpen } = useUIState()
 const { metaSymbol } = useShortcuts()
@@ -29,6 +38,7 @@ const items = computed(() => [
   [{
     label: 'Sign out',
     icon: 'i-heroicons-arrow-left-on-rectangle',
+    click: () => logout(),
   }],
 ])
 </script>
@@ -46,12 +56,12 @@ const items = computed(() => [
         color="gray"
         variant="ghost"
         class="w-full"
-        label="Benjamin"
+        :label="`${user.firstName} ${user.lastName}`"
         :class="[open && 'bg-gray-50 dark:bg-gray-800']"
       >
         <template #leading>
           <UAvatar
-            src="https://avatars.githubusercontent.com/u/739984?v=4"
+            :src="avatarUrl"
             size="2xs"
           />
         </template>
@@ -67,11 +77,9 @@ const items = computed(() => [
 
     <template #account>
       <div class="text-left">
-        <p>
-          Signed in as
-        </p>
+        <p>Signed in as</p>
         <p class="truncate font-medium text-gray-900 dark:text-white">
-          ben@nuxtlabs.com
+          {{ user.email }}
         </p>
       </div>
     </template>
