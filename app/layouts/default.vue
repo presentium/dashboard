@@ -2,6 +2,8 @@
 const route = useRoute()
 const { isHelpSlideoverOpen } = useDashboard()
 
+const { data: user, status: userStatus } = await useApi('/auth/@me')
+
 const links = [{
   id: 'home',
   label: 'Home',
@@ -97,7 +99,14 @@ const groups = [{
 
         <template #footer>
           <!-- ~/components/UserDropdown.vue -->
-          <UserDropdown />
+          <UserDropdown
+            v-if="userStatus === 'success'"
+            :user="user"
+          />
+          <USkeleton
+            v-else
+            class="h-6 w-full"
+          />
         </template>
       </UDashboardSidebar>
     </UDashboardPanel>

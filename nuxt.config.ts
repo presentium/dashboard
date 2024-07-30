@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@vueuse/nuxt',
     'nuxt-oidc-auth',
+    'nuxt-open-fetch',
   ],
 
   oidc: {
@@ -31,7 +32,35 @@ export default defineNuxtConfig({
       },
     },
     middleware: {
+      // The dashboard is only for authenticated users
       globalMiddlewareEnabled: true,
+    },
+  },
+
+  openFetch: {
+    clients: {
+      api: {
+        // NOTE: here it is intentional to path through /api, since we are using a proxy to the API server, which
+        // appends the user access token to the requests for authentication.
+        baseURL: `${process.env.NUXT_PUBLIC_SITE_URL}/api/v1`,
+        schema: '../openapi/api-docs-v1.json',
+      },
+    },
+  },
+
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.API_BASE_URL,
+    },
+  },
+
+  nitro: {
+    storage: {
+      // TODO [lh] use redis in production
+      oidc: {
+        driver: 'fs',
+        base: './.nuxt/var/sessions',
+      },
     },
   },
 

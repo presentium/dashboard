@@ -52,6 +52,15 @@ Most of the features of the dashboard require the API to be running. You can run
 instructions in the [API repository](https://github.com/presentium/api). When running in development mode, the API
 will also start a mock OIDC provider that will give you a couple of users you can use to log in with different roles.
 
+#### Automated API client
+
+We leverage `nuxt-open-fetch` to create a fully-typed, easy-to-use API client. This client is generated automatically
+from the OpenAPI schema of the API. To pull the local schema, make sure the API is running and run:
+
+```bash
+npm run fetch:api-docs
+```
+
 ## Continuous Delivery
 
 Each commit on the `main` branch is deployed to [staging.presentium.ch](https://staging.presentium.ch)
