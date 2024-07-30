@@ -17,16 +17,16 @@ useHead({
   },
 })
 
-const title = 'Nuxt UI Pro - Dashboard template'
-const description = 'Nuxt UI Pro is a collection of premium Vue components built on top of Nuxt UI to create beautiful & responsive Nuxt applications in minutes.'
+const title = 'Presentium - Management Dashboard'
+const description = 'Manage users, start workflows, create exports. From Presentium - Attendance monitoring made easy.'
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
   ogDescription: description,
-  ogImage: 'https://dashboard-template.nuxt.dev/social-card.png',
-  twitterImage: 'https://dashboard-template.nuxt.dev/social-card.png',
+  ogImage: 'https://repository-images.githubusercontent.com/832545372/2ad772c0-904a-440e-add5-667a6d339344',
+  twitterImage: 'https://repository-images.githubusercontent.com/832545372/2ad772c0-904a-440e-add5-667a6d339344',
   twitterCard: 'summary_large_image',
 })
 </script>

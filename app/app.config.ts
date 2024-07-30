@@ -1,8 +1,9 @@
 export default defineAppConfig({
   ui: {
-    primary: 'sky',
-    gray: 'cool',
+    primary: 'purple',
+    gray: 'zinc',
     tooltip: {
+      // @ts-expect-error weird issue with DeepPartial in @nuxt/ui
       default: {
         openDelay: 500,
       },
