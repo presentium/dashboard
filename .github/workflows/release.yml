@@ -1,0 +1,38 @@
+name: Push a release tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish-release:
+    name: Check linting + formatting with ESLint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup node env 🏗
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          check-latest: true
+          cache: npm
+
+      - name: Bump version 🚀
+        run: |
+          npx --yes changelogen@latest --release --push -r ${{ inputs.version }}
+          npx --yes changelogen@latest gh release
+          git push origin main:production
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

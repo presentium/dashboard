@@ -30,6 +30,6 @@ export default defineEventHandler(async (event) => {
         Authorization: `Bearer ${accessToken}`,
       },
     }),
-    enableLogger: true,
+    enableLogger: false,
   })(event)
 })

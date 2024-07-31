@@ -1,5 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { env } from 'node:process'
+import { execSync } from 'node:child_process'
+import { version } from './package.json'
 
 function getPublicURL(): string {
   if (env.CF_PAGES_URL) {
@@ -7,6 +9,24 @@ function getPublicURL(): string {
   }
 
   return env.NUXT_PUBLIC_SITE_URL
+}
+
+function getRevision(): string {
+  try {
+    return execSync('git rev-parse --short HEAD').toString().trim()
+  }
+  catch (e) {
+    console.error('Unexpected error fetching revision', e)
+    return 'unknown'
+  }
+}
+
+function getVersion(): string {
+  if (!version) {
+    return getRevision()
+  }
+
+  return version
 }
 
 export default defineNuxtConfig({
@@ -61,6 +81,7 @@ export default defineNuxtConfig({
     // Keys in public are exposed to the client side
     public: {
       apiBaseUrl: env.API_BASE_URL,
+      version: getRevision(),
     },
   },
 
@@ -87,4 +108,22 @@ export default defineNuxtConfig({
 
   future: { compatibilityVersion: 4 },
   compatibilityDate: '2024-07-11',
+
+  // Env-specific overrides
+
+  $development: {
+    runtimeConfig: {
+      public: {
+        version: 'dev',
+      },
+    },
+  },
+
+  $production: {
+    runtimeConfig: {
+      public: {
+        version: getVersion(),
+      },
+    },
+  },
 })

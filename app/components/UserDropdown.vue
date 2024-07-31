@@ -7,6 +7,7 @@ const { user } = defineProps<{
 
 const avatarUrl = computed(() => user ? `https://api.multiavatar.com/${user.username}.svg` : null)
 const { logout } = useOidcAuth()
+const { public: { version } } = useRuntimeConfig()
 
 const { isHelpSlideoverOpen } = useDashboard()
 const { isDashboardSearchModalOpen } = useUIState()
@@ -39,6 +40,11 @@ const items = computed(() => [
     label: 'Sign out',
     icon: 'i-heroicons-arrow-left-on-rectangle',
     click: () => logout(),
+  }],
+  [{
+    slot: 'version',
+    label: '',
+    disabled: true,
   }],
 ])
 </script>
@@ -73,6 +79,12 @@ const items = computed(() => [
           />
         </template>
       </UButton>
+    </template>
+
+    <template #version>
+      <div class="text-left text-sm">
+        <p>Version: <span class="font-medium">{{ version }}</span></p>
+      </div>
     </template>
 
     <template #account>
