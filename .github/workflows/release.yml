@@ -1,4 +1,4 @@
-name: Push a release tag
+name: Release 🚀
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   publish-release:
-    name: Check linting + formatting with ESLint
+    name: Create the changelog and push the release
     runs-on: ubuntu-latest
 
     steps:
@@ -21,6 +21,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_tag_gpgsign: true
+          git_commit_gpgsign: true
 
       - name: Setup node env 🏗
         uses: actions/setup-node@v4
