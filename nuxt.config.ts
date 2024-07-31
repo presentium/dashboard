@@ -13,7 +13,6 @@ export default defineNuxtConfig({
   extends: ['@nuxt/ui-pro'],
 
   modules: [
-    '@nuxthub/core',
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/ui',
