@@ -63,11 +63,12 @@ npm run fetch:api-docs
 
 ## Continuous Delivery
 
-Each commit on the `main` branch is deployed to [staging.presentium.ch](https://staging.presentium.ch)
-using GitHub Actions, to a dedicated namespace on the Cloud infrastructure.
+We use Cloudflare Pages for automated continous delivery, which deploys preview environments for every commits on
+branches and pull requests. The details of the deployment should always be available in the checks of the commits.
 
-The default branch therefore is `main` and it is protected. When a change is ready to be deployed,
-the deployment workflow should be triggered manually providing the desired version number.
+The `production` branch is automatically deployed to the production environment, available at
+[app.presentium.ch](https://app.presentium.ch). To release a new version, there is a custom workflow that has
+a manual dispatch event that will release a version and trigger the deployment.
 
 ## Contributing
 

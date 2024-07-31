@@ -1,10 +1,19 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { env } from 'node:process'
 
+function getPublicURL(): string {
+  if (env.CF_PAGES_URL) {
+    return env.CF_PAGES_URL
+  }
+
+  return env.NUXT_PUBLIC_SITE_URL
+}
+
 export default defineNuxtConfig({
   extends: ['@nuxt/ui-pro'],
 
   modules: [
+    '@nuxthub/core',
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/ui',
@@ -24,7 +33,7 @@ export default defineNuxtConfig({
         tokenUrl: env.AUTH_OIDC_PROVIDER_TOKEN_URL ?? '',
         userinfoUrl: env.AUTH_OIDC_PROVIDER_USERINFO_URL,
         logoutUrl: env.AUTH_OIDC_PROVIDER_LOGOUT_URL,
-        redirectUri: `${env.NUXT_PUBLIC_SITE_URL}/auth/oidc/callback`,
+        redirectUri: `${getPublicURL()}/auth/oidc/callback`,
         tokenRequestType: 'form-urlencoded',
         scope: ['openid', 'profile', 'roles'],
         state: true,
@@ -42,7 +51,7 @@ export default defineNuxtConfig({
       api: {
         // NOTE: here it is intentional to path through /api, since we are using a proxy to the API server, which
         // appends the user access token to the requests for authentication.
-        baseURL: `${env.NUXT_PUBLIC_SITE_URL}/api/v1`,
+        baseURL: `${getPublicURL()}/api/v1`,
         schema: '../openapi/api-docs-v1.json',
       },
     },
