@@ -49,14 +49,15 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    oidcTokenKey: env.NUXT_OIDC_TOKEN_KEY,
+    // Keys in public are exposed to the client side
     public: {
       apiBaseUrl: env.API_BASE_URL,
     },
   },
 
   nitro: {
-    storage: {
-      // TODO [lh] use redis in production
+    devStorage: {
       oidc: {
         driver: 'fs',
         base: './.nuxt/var/sessions',

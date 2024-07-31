@@ -1,4 +1,3 @@
-import { env } from 'node:process'
 import { getUserSessionId, requireUserSession } from 'nuxt-oidc-auth/runtime/server/utils/session.mjs'
 import type { PersistentSession } from 'nuxt-oidc-auth/runtime/types/oidc.d.ts'
 import { decryptToken } from 'nuxt-oidc-auth/runtime/server/utils/security.mjs'
@@ -16,13 +15,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Not Authenticated' })
   }
 
-  const tokenKey = env.NUXT_OIDC_TOKEN_KEY as string
-  const accessToken = await decryptToken(persistentSession.accessToken, tokenKey)
+  const { public: { apiBaseUrl }, oidcTokenKey } = useRuntimeConfig()
+  const accessToken = await decryptToken(persistentSession.accessToken, oidcTokenKey)
   if (!accessToken) {
     throw createError({ statusCode: 401, statusMessage: 'Not Authenticated' })
   }
 
-  const { public: { apiBaseUrl } } = useRuntimeConfig()
   return createProxyEventHandler({
     target: apiBaseUrl,
     pathRewrite: { '^/api': '' },
