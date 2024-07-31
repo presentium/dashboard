@@ -22,6 +22,7 @@ jobs:
         with:
           ref: main
           ssh-key: ${{ secrets.SSH_DEPLOY_KEY }}
+          fetch-depth: 0
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
