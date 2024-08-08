@@ -36,6 +36,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/ui',
+    '@nuxthub/core',
     '@vueuse/nuxt',
     'nuxt-oidc-auth',
     'nuxt-open-fetch',
@@ -89,7 +90,17 @@ export default defineNuxtConfig({
     },
   },
 
+  hub: {
+    kv: true,
+  },
+
   nitro: {
+    storage: {
+      oidc: {
+        driver: 'cloudflareKVBinding',
+        binding: 'KV_OIDC',
+      },
+    },
     devStorage: {
       oidc: {
         driver: 'fs',

@@ -35,6 +35,7 @@
     "@commitlint/config-angular": "^19.3.0",
     "@commitlint/cz-commitlint": "^19.2.0",
     "@nuxt/eslint": "^0.4.0",
+    "@nuxthub/core": "^0.7.1",
     "commitizen": "^4.3.0",
     "eslint": "^9.8.0",
     "eslint-plugin-format": "^0.1.2",
@@ -43,7 +44,7 @@
     "lint-staged": "^15.2.7",
     "nuxt-open-fetch": "^0.9.1",
     "vue-tsc": "^2.0.29",
-    "wrangler": "^3.67.1"
+    "wrangler": "^3.69.1"
   },
   "config": {
     "commitizen": {
