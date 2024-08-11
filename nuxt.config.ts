@@ -4,11 +4,11 @@ import { execSync } from 'node:child_process'
 import { version } from './package.json'
 
 function getPublicURL(): string {
-  if (env.CF_PAGES_URL) {
-    return env.CF_PAGES_URL
+  if (env.CF_PAGES_BRANCH === 'main') {
+    return env.NUXT_PUBLIC_SITE_URL
   }
 
-  return env.NUXT_PUBLIC_SITE_URL
+  return env.CF_PAGES_URL || env.NUXT_PUBLIC_SITE_URL
 }
 
 function getRevision(): string {
@@ -21,12 +21,12 @@ function getRevision(): string {
   }
 }
 
-function getVersion(): string {
-  if (!version) {
-    return getRevision()
+function getVersion() {
+  if (env.CF_PAGES_BRANCH === 'production') {
+    return version
   }
 
-  return version
+  return getRevision()
 }
 
 export default defineNuxtConfig({
@@ -85,7 +85,7 @@ export default defineNuxtConfig({
     // Keys in public are exposed to the client side
     public: {
       apiBaseUrl: env.API_BASE_URL,
-      version: getRevision(),
+      version: getVersion(),
     },
   },
 
@@ -125,14 +125,6 @@ export default defineNuxtConfig({
     runtimeConfig: {
       public: {
         version: 'dev',
-      },
-    },
-  },
-
-  $production: {
-    runtimeConfig: {
-      public: {
-        version: getVersion(),
       },
     },
   },
