@@ -36,7 +36,6 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/ui',
-    '@nuxthub/core',
     '@vueuse/nuxt',
     'nuxt-oidc-auth',
     'nuxt-open-fetch',
@@ -88,10 +87,6 @@ export default defineNuxtConfig({
       apiBaseUrl: env.API_BASE_URL,
       version: getRevision(),
     },
-  },
-
-  hub: {
-    kv: true,
   },
 
   nitro: {
