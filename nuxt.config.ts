@@ -75,7 +75,7 @@ export default defineNuxtConfig({
       api: {
         // NOTE: here it is intentional to path through /api, since we are using a proxy to the API server, which
         // appends the user access token to the requests for authentication.
-        baseURL: `${getPublicURL()}/api/v1`,
+        baseURL: `/api/v1`,
         schema: '../openapi/api-docs-v1.json',
       },
     },

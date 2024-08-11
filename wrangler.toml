@@ -1,0 +1,7 @@
+name = "dashboard"
+route = "staging.presentium.ch/*"
+kv_namespaces = [ { binding = "KV_OIDC", id = "3e6dd32b12b2493eb6a5bf354e3083ae" }, ]
+
+[env.production]
+route = "app.presentium.ch/*"
+kv_namespaces = [ { binding = "KV_OIDC", id = "a6b051a287814b98b5e01acc39665cee" }, ]
