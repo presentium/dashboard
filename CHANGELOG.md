@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v0.0.3
+
+[compare changes](https://github.com/presentium/dashboard/compare/v0.0.2...v0.0.3)
+
+### 🤖 CI
+
+- Remove nuxt hub module causing issues with prod deployment ([cd44649](https://github.com/presentium/dashboard/commit/cd44649))
+- Set public url to staging domain on main branch deployments ([52322e5](https://github.com/presentium/dashboard/commit/52322e5))
+
+### ❤️ Contributors
+
+- Loïc Herman <loic@loicherman.ch>
+
 ## v0.0.2
 
 [compare changes](https://github.com/presentium/dashboard/compare/v0.0.1...v0.0.2)
