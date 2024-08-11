@@ -1,6 +1,25 @@
 # Changelog
 
 
+## v0.0.2
+
+[compare changes](https://github.com/presentium/dashboard/compare/v0.0.1...v0.0.2)
+
+### 🩹 Fixes
+
+- Working configuration for authentik ([cfe88af](https://github.com/presentium/dashboard/commit/cfe88af))
+- Persistent kv storage for sessions ([657cf41](https://github.com/presentium/dashboard/commit/657cf41))
+- Add logging for reverse proxy ([23c5a5e](https://github.com/presentium/dashboard/commit/23c5a5e))
+- Full url proxy didn't send authorization headers ([f748008](https://github.com/presentium/dashboard/commit/f748008))
+
+### 🤖 CI
+
+- Avoid adding release commits to changelog [skip ci] ([6fda122](https://github.com/presentium/dashboard/commit/6fda122))
+
+### ❤️ Contributors
+
+- Loïc Herman <loic@loicherman.ch>
+
 ## v0.0.1
 
 
