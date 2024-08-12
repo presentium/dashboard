@@ -9,9 +9,9 @@ const avatarUrl = computed(() => user ? `https://api.multiavatar.com/${user.user
 const { logout } = useOidcAuth()
 const { public: { version } } = useRuntimeConfig()
 
+const { data: versionMetadata } = useLazyApi('/metadata/version')
+
 const { isHelpSlideoverOpen } = useDashboard()
-const { isDashboardSearchModalOpen } = useUIState()
-const { metaSymbol } = useShortcuts()
 
 const items = computed(() => [
   [{
@@ -20,23 +20,11 @@ const items = computed(() => [
     disabled: true,
   }],
   [{
-    label: 'Settings',
-    icon: 'i-heroicons-cog-8-tooth',
-    to: '/settings',
-  }, {
-    label: 'Command menu',
-    icon: 'i-heroicons-command-line',
-    shortcuts: [metaSymbol.value, 'K'],
-    click: () => {
-      isDashboardSearchModalOpen.value = true
-    },
-  }, {
     label: 'Help & Support',
     icon: 'i-heroicons-question-mark-circle',
     shortcuts: ['?'],
     click: () => isHelpSlideoverOpen.value = true,
-  }],
-  [{
+  }, {
     label: 'Sign out',
     icon: 'i-heroicons-arrow-left-on-rectangle',
     click: () => logout(),
@@ -84,6 +72,9 @@ const items = computed(() => [
     <template #version>
       <div class="text-left text-sm">
         <p>Version: <span class="font-medium">{{ version }}</span></p>
+        <p v-if="versionMetadata">
+          API: <span class="font-medium">{{ versionMetadata.version }}</span>
+        </p>
       </div>
     </template>
 
