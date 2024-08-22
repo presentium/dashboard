@@ -1,3 +1,12 @@
+<script setup lang="ts">
+</script>
+
 <template>
-  <p>hello my classes</p>
+  <UDashboardPage>
+    <UDashboardPanel grow>
+      <UDashboardNavbar title="My classes" />
+
+      <UDashboardPanelContent />
+    </UDashboardPanel>
+  </UDashboardPage>
 </template>

@@ -1,3 +1,12 @@
+<script setup lang="ts">
+</script>
+
 <template>
-  <p>hello devices</p>
+  <UDashboardPage>
+    <UDashboardPanel grow>
+      <UDashboardNavbar title="Reader devices" />
+
+      <UDashboardPanelContent />
+    </UDashboardPanel>
+  </UDashboardPage>
 </template>
