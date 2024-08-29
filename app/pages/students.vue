@@ -27,6 +27,7 @@ function items(row) {
     [{
       label: 'Delete',
       icon: 'i-heroicons-trash-20-solid',
+      click: () => useApi<StudentViewModel[]>('/students/{id}', { method: 'delete', path: { id: row.id } }),
     }],
   ]
 }
