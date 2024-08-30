@@ -4,7 +4,6 @@ import type { Period, Range } from '~/types'
 
 const range = ref<Range>({ start: sub(new Date(), { days: 14 }), end: new Date() })
 const period = ref<Period>('daily')
-const { data: students, pending } = useApi<StudentViewModel[]>('/presence/percent')
 </script>
 
 <template>

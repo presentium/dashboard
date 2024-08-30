@@ -14,6 +14,20 @@ const props = defineProps({
   },
 })
 
+const startDate = new Date(props.range.start).toISOString().slice(0, -1)
+const endDate = new Date(props.range.end).toISOString().slice(0, -1)
+
+const { data: data2, pending } = useApi<PresenceViewPercentModel[]>(
+  '/presences',
+  {
+    params: {
+      startDate,
+      endDate,
+      classId: 1,
+    },
+  },
+)
+
 const cardRef = ref<HTMLElement | null>(null)
 
 interface DataRecord {
@@ -34,7 +48,10 @@ const { data } = await useAsyncData<DataRecord[]>(async () => {
   const min = 1000
   const max = 10000
 
-  return dates.map(date => ({ date, amount: Math.floor(Math.random() * (max - min + 1)) + min }))
+  return dates.map(date => ({
+    date,
+    amount: Math.floor(Math.random() * (max - min + 1)) + min,
+  }))
 }, {
   watch: [() => props.period, () => props.range],
   default: () => [],
@@ -65,7 +82,6 @@ function xTicks(i: number) {
 
 const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amount)}`
 </script>
-
 <template>
   <UDashboardCard
     ref="cardRef"
@@ -74,7 +90,7 @@ const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amo
     <template #header>
       <div>
         <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">
-          Revenue
+          Absence
         </p>
         <p class="text-3xl text-gray-900 dark:text-white font-semibold">
           {{ formatNumber(total) }}
