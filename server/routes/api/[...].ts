@@ -1,6 +1,6 @@
-import { getUserSessionId, requireUserSession } from 'nuxt-oidc-auth/runtime/server/utils/session.mjs'
+import { getUserSessionId, requireUserSession } from 'nuxt-oidc-auth/runtime/server/utils/session.js'
 import type { PersistentSession } from 'nuxt-oidc-auth/runtime/types/oidc.d.ts'
-import { decryptToken } from 'nuxt-oidc-auth/runtime/server/utils/security.mjs'
+import { decryptToken } from 'nuxt-oidc-auth/runtime/server/utils/security.js'
 import { createProxyEventHandler } from 'h3-proxy'
 import { consola } from 'consola'
 

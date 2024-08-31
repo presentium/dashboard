@@ -110,6 +110,7 @@ export default defineNuxtConfig({
 
   colorMode: {
     disableTransition: false,
+    preference: 'light',
   },
 
   typescript: { strict: false },

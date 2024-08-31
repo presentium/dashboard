@@ -1,58 +1,83 @@
 <script setup lang="ts">
+import type { DashboardSidebarLink } from '#ui-pro/types'
+
 const { isHelpSlideoverOpen } = useDashboard()
 
 const { data: user, status: userStatus } = await useApi('/auth/@me')
+const { student, teacher, admin } = useRole()
 
-const links = [{
-  id: 'home',
-  label: 'Home',
-  icon: 'i-heroicons-home',
-  to: '/',
-  tooltip: {
-    text: 'Home',
-    shortcuts: ['G', 'H'],
-  },
-}, {
-  id: 'users',
-  label: 'Users',
-  icon: 'i-heroicons-user-group',
-  to: '/users',
-  tooltip: {
-    text: 'Users',
-    shortcuts: ['G', 'U'],
-  },
-}, {
-  id: 'settings',
-  label: 'Settings',
-  to: '/settings',
-  icon: 'i-heroicons-cog-8-tooth',
-  children: [{
-    label: 'General',
-    to: '/settings',
-    exact: true,
-  }, {
-    label: 'Members',
-    to: '/settings/members',
-  }, {
-    label: 'Notifications',
-    to: '/settings/notifications',
-  }],
-  tooltip: {
-    text: 'Settings',
-    shortcuts: ['G', 'S'],
-  },
-}]
+const links = computed((): DashboardSidebarLink[] => {
+  const res: DashboardSidebarLink[] = [{
+    label: 'Home',
+    icon: 'i-heroicons-home',
+    to: '/',
+  }]
+
+  if (student.value && !teacher.value) {
+    res.push({
+      label: 'My classes',
+      to: '/@me/classes',
+      icon: 'i-heroicons-academic-cap',
+    })
+  }
+
+  if (teacher.value) {
+    res.push(
+      {
+        label: 'Personal space',
+        icon: 'i-heroicons-academic-cap',
+        children: [{
+          label: 'My classes',
+          to: '/@me/classes',
+        }, {
+          label: 'My devices',
+          to: '/@me/devices',
+        }],
+      },
+    )
+
+    if (!admin.value) {
+      res.push({
+        label: 'Management',
+        icon: 'i-heroicons-adjustments-horizontal',
+        children: [{
+          label: 'Classes',
+          to: '/directory/classes',
+        }, {
+          label: 'Students',
+          to: '/directory/students',
+        }],
+      })
+    }
+  }
+
+  if (admin.value) {
+    res.push({
+      label: 'Management',
+      icon: 'i-heroicons-adjustments-horizontal',
+      children: [{
+        label: 'Classes',
+        to: '/directory/classes',
+      }, {
+        label: 'Students',
+        to: '/directory/students',
+      }, {
+        label: 'Teachers',
+        to: '/directory/teachers',
+      }, {
+        label: 'Devices',
+        to: '/directory/devices',
+      }],
+    })
+  }
+
+  return res
+})
 
 const footerLinks = [{
   label: 'Help & Support',
   icon: 'i-heroicons-question-mark-circle',
   click: () => isHelpSlideoverOpen.value = true,
-}]
-
-const groups = [{
-  key: 'links',
-  label: 'Go to',
-  commands: links.map(link => ({ ...link, shortcuts: link.tooltip?.shortcuts })),
 }]
 </script>
 
@@ -73,10 +98,6 @@ const groups = [{
       </UDashboardNavbar>
 
       <UDashboardSidebar>
-        <template #header>
-          <UDashboardSearchButton />
-        </template>
-
         <UDashboardSidebarLinks :links="links" />
 
         <div class="flex-1" />
@@ -87,14 +108,16 @@ const groups = [{
 
         <template #footer>
           <!-- ~/components/UserDropdown.vue -->
-          <UserDropdown
-            v-if="userStatus === 'success'"
-            :user="user"
-          />
-          <USkeleton
-            v-else
-            class="h-6 w-full"
-          />
+          <ClientOnly>
+            <UserDropdown
+              v-if="userStatus === 'success'"
+              :user="user"
+            />
+            <USkeleton
+              v-else
+              class="h-6 w-full"
+            />
+          </ClientOnly>
         </template>
       </UDashboardSidebar>
     </UDashboardPanel>
@@ -103,11 +126,9 @@ const groups = [{
 
     <!-- ~/components/HelpSlideover.vue -->
     <HelpSlideover />
-    <!-- ~/components/NotificationsSlideover.vue -->
-    <NotificationsSlideover />
 
     <ClientOnly>
-      <LazyUDashboardSearch :groups="groups" />
+      <LazyUDashboardSearch />
     </ClientOnly>
   </UDashboardLayout>
 </template>
