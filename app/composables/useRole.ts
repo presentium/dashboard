@@ -6,3 +6,10 @@ export function useRole() {
     student: computed(() => user.value.providerInfo?.roles?.some((r: string) => ['admin', 'teacher', 'student'].includes(r)) ?? false),
   }
 }
+
+export function useName() {
+  const { user } = useOidcAuth()
+  return {
+    name: computed(() => user.value.providerInfo?.name),
+  }
+}

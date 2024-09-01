@@ -47,7 +47,7 @@ defineShortcuts({
             v-model="q"
             icon="i-heroicons-funnel"
             autocomplete="off"
-            placeholder="Filter users..."
+            placeholder="Filter devices..."
             class="hidden lg:block"
             @keydown.esc="$event.target.blur()"
           >
