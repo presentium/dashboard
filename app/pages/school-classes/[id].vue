@@ -70,21 +70,21 @@ function formatTime(time: string): string {
             Name
           </div>
           <div class="col-span-2">
-            {{ schoolClass.name }}
+            {{ schoolClass?.name }}
           </div>
 
           <div class="text-gray-400 dark:text-gray-500">
             Room
           </div>
           <div class="col-span-2">
-            <UBadge :label="schoolClass.room" variant="subtle" />
+            <UBadge :label="schoolClass?.room" variant="subtle" />
           </div>
 
           <div class="text-gray-400 dark:text-gray-500">
             Time
           </div>
           <div class="col-span-2">
-            <span>{{ formatDow(schoolClass.dayOfWeek) }} at {{ formatTime(schoolClass.start as string) }} to {{ formatTime(schoolClass.end as string) }}</span>
+            <span v-if="schoolClass">{{ formatDow(schoolClass?.dayOfWeek) }} at {{ formatTime(schoolClass?.start as string) }} to {{ formatTime(schoolClass?.end as string) }}</span>
           </div>
         </div>
 
@@ -99,7 +99,7 @@ function formatTime(time: string): string {
               Name
             </div>
             <div class="col-span-2">
-              {{ schoolClass.teacher.name }}
+              {{ schoolClass?.teacher?.name }}
             </div>
           </div>
         </UDashboardSection>
@@ -148,7 +148,7 @@ function formatTime(time: string): string {
                   </div>
                 </div>
               </li>
-              <li v-if="filteredStudents.length === 0">
+              <li v-if="!filteredStudents || filteredStudents.length === 0">
                 <div class="py-4 px-6 flex align-center justify-center gap-2 text-gray-400 dark:text-gray-500">
                   <UIcon name="i-heroicons-circle-stack-20-solid" class="size-6" />
                   no students found

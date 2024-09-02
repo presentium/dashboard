@@ -1,16 +1,24 @@
 <script setup lang="ts">
-import { eachDayOfInterval, eachMonthOfInterval, eachWeekOfInterval, format } from 'date-fns'
+import { eachDayOfInterval, eachMonthOfInterval, eachWeekOfInterval, format, isSameDay } from 'date-fns'
 import { VisArea, VisAxis, VisCrosshair, VisLine, VisTooltip, VisXYContainer } from '@unovis/vue'
-import type { Period, Range } from '~/types'
+import type { Period, Range } from '~/types/api'
 
-const props = defineProps({
-  period: {
-    type: String as PropType<Period>,
-    required: true,
-  },
-  range: {
-    type: Object as PropType<Range>,
-    required: true,
+const props = defineProps<{
+  period: Period
+  range: Range
+  classId?: number
+  studentId?: string
+}>()
+const { classId: schoolClassId, studentId, range } = toRefs(props)
+
+const startDate = computed(() => new Date(range.value.start).toISOString().slice(0, -1))
+const endDate = computed(() => new Date(range.value.end).toISOString().slice(0, -1))
+const { data: fetchedData } = useApi('/presences', {
+  query: {
+    schoolClassId,
+    studentId,
+    start: startDate,
+    end: endDate,
   },
 })
 
@@ -23,20 +31,30 @@ interface DataRecord {
 
 const { width } = useElementSize(cardRef)
 
-// We use `useAsyncData` here to have same random data on the client and server
 const { data } = await useAsyncData<DataRecord[]>(async () => {
+  const presences = fetchedData.value
+
+  const availableDates = presences.map(d => new Date(d.date))
   const dates = ({
     daily: eachDayOfInterval,
     weekly: eachWeekOfInterval,
     monthly: eachMonthOfInterval,
   })[props.period](props.range)
 
-  const min = 1000
-  const max = 10000
-
-  return dates.map(date => ({ date, amount: Math.floor(Math.random() * (max - min + 1)) + min }))
+  return dates
+    .filter(date => availableDates.some(d => isSameDay(d, date)))
+    .map((date) => {
+      const matchingRecords = presences.filter(d => isSameDay(new Date(d.date), date))
+      if (matchingRecords.length > 0) {
+        const presentStudents = matchingRecords.filter(record => record.present).length
+        return { date, amount: (presentStudents / matchingRecords.length) * 100 }
+      }
+      else {
+        return { date, amount: 0 }
+      }
+    })
 }, {
-  watch: [() => props.period, () => props.range],
+  watch: [() => props.period, () => props.range, fetchedData],
   default: () => [],
 })
 
@@ -45,7 +63,7 @@ const y = (d: DataRecord) => d.amount
 
 const total = computed(() => data.value.reduce((acc: number, { amount }) => acc + amount, 0))
 
-const formatNumber = new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format
+const formatNumber = new Intl.NumberFormat('en', { style: 'unit', unit: 'percent', maximumFractionDigits: 0 }).format
 
 function formatDate(date: Date): string {
   return ({
@@ -74,10 +92,10 @@ const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amo
     <template #header>
       <div>
         <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">
-          Revenue
+          mean presence
         </p>
         <p class="text-3xl text-gray-900 dark:text-white font-semibold">
-          {{ formatNumber(total) }}
+          {{ data.length ? formatNumber(total / data.length) : '0%' }}
         </p>
       </div>
     </template>
