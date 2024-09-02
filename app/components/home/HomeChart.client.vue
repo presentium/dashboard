@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { eachDayOfInterval, eachMonthOfInterval, eachWeekOfInterval, format } from 'date-fns'
+import { eachDayOfInterval, eachMonthOfInterval, eachWeekOfInterval, format, isSameDay } from 'date-fns'
 import { VisArea, VisAxis, VisCrosshair, VisLine, VisTooltip, VisXYContainer } from '@unovis/vue'
 import type { Period, Range } from '~/types'
 
@@ -12,22 +12,25 @@ const props = defineProps({
     type: Object as PropType<Range>,
     required: true,
   },
+  classId: {
+    type: Number as PropType<number>,
+    required: true,
+  },
+  studentId: {
+    type: String as PropType<string>,
+    required: false,
+  },
 })
 
-const startDate = new Date(props.range.start).toISOString().slice(0, -1)
-const endDate = new Date(props.range.end).toISOString().slice(0, -1)
-
-const { data: data2, pending } = useApi<PresenceViewPercentModel[]>(
-  '/presences',
-  {
-    params: {
-      startDate,
-      endDate,
-      classId: 1,
-    },
-  },
-)
-
+const startDate = computed(() => new Date(props.range.start).toISOString().slice(0, -1))
+const endDate = computed(() => new Date(props.range.end).toISOString().slice(0, -1))
+const { data: fetchedData } = useApi<PresenceViewModel[]>('/presences', {
+  params: computed(() => ({
+    startDate: startDate.value,
+    endDate: endDate.value,
+    classId: props.classId,
+  })),
+})
 const cardRef = ref<HTMLElement | null>(null)
 
 interface DataRecord {
@@ -37,23 +40,28 @@ interface DataRecord {
 
 const { width } = useElementSize(cardRef)
 
-// We use `useAsyncData` here to have same random data on the client and server
 const { data } = await useAsyncData<DataRecord[]>(async () => {
+  const availableDates = fetchedData.value.map(d => new Date(d.date).toISOString().slice(0, 10))
   const dates = ({
     daily: eachDayOfInterval,
     weekly: eachWeekOfInterval,
     monthly: eachMonthOfInterval,
   })[props.period](props.range)
 
-  const min = 1000
-  const max = 10000
-
-  return dates.map(date => ({
-    date,
-    amount: Math.floor(Math.random() * (max - min + 1)) + min,
-  }))
+  return dates
+    .filter(date => availableDates.includes(date.toISOString().slice(0, 10)))
+    .map((date) => {
+      const matchingRecords = fetchedData.value.filter(d => isSameDay(new Date(d.date), date))
+      if (matchingRecords.length > 0) {
+        const presentStudents = matchingRecords.filter(record => record.present).length
+        return { date, amount: (presentStudents / matchingRecords.length) * 100 }
+      }
+      else {
+        return { date, amount: 0 }
+      }
+    })
 }, {
-  watch: [() => props.period, () => props.range],
+  watch: [() => props.period, () => props.range, () => props.classId, () => props.studentId],
   default: () => [],
 })
 
@@ -62,7 +70,7 @@ const y = (d: DataRecord) => d.amount
 
 const total = computed(() => data.value.reduce((acc: number, { amount }) => acc + amount, 0))
 
-const formatNumber = new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format
+const formatNumber = new Intl.NumberFormat('en', { style: 'unit', unit: 'percent', maximumFractionDigits: 0 }).format
 
 function formatDate(date: Date): string {
   return ({
@@ -82,6 +90,7 @@ function xTicks(i: number) {
 
 const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amount)}`
 </script>
+
 <template>
   <UDashboardCard
     ref="cardRef"
@@ -90,10 +99,10 @@ const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amo
     <template #header>
       <div>
         <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">
-          Absence
+          mean presence
         </p>
         <p class="text-3xl text-gray-900 dark:text-white font-semibold">
-          {{ formatNumber(total) }}
+          {{ formatNumber(total / data.length) }}
         </p>
       </div>
     </template>
