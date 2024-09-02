@@ -179,7 +179,7 @@ async function startPresenceControl() {
         description="Create a session for one of your classes and start recording attendance"
         :ui="{ width: 'sm:max-w-md' }"
       >
-        <UFormGroup label="School class">
+        <UFormGroup label="School class" description="You may only start sessions for classes on the current day">
           <FormSchoolClassSelect v-model="selectedSchoolClass" self today />
         </UFormGroup>
 
