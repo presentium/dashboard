@@ -27,16 +27,17 @@ interface ClassPresence {
 }
 
 const { data } = await useAsyncData<ClassPresence[]>(async () => {
-  const classPresenceMap: Record<number, { count: number, name: string }> = {}
+  const classPresenceMap: Record<number, { count: number, total: number, name: string }> = {}
 
   fetchedData.value.forEach((record) => {
     const classId = record.schoolClass.id
     const className = record.schoolClass.name
 
     if (!classPresenceMap[classId]) {
-      classPresenceMap[classId] = { count: 0, name: className }
+      classPresenceMap[classId] = { count: 0, total: 0, name: className }
     }
 
+    classPresenceMap[classId].total += 1
     if (record.present) {
       classPresenceMap[classId].count += 1
     }
@@ -45,7 +46,7 @@ const { data } = await useAsyncData<ClassPresence[]>(async () => {
   const classPresenceList = Object.entries(classPresenceMap).map(([classId, data], index) => ({
     classId: Number(classId),
     className: data.name,
-    presenceCount: data.count,
+    presenceCount: data.count / data.total * 100,
     color: colors[index % colors.length],
   }))
 
