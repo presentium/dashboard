@@ -1,30 +1,14 @@
 <script setup lang="ts">
-import { computed, defineEmits, defineProps, ref, watch } from 'vue'
+import type { StudentRef } from '~/types/api'
 
-const props = defineProps({
-  studentId: {
-    type: String as PropType<string>,
-    required: true,
-  },
-})
+const { data: studentRefs } = useApi('/students', { query: { refs: '' } })
+const defaultOption = { id: undefined, name: 'All students' }
+const studentOptions = computed(() => [defaultOption, ...(studentRefs?.value ?? [])])
 
-const emit = defineEmits(['update:student-id'])
-
-const { data: fetchedData } = useApi<StudentViewModel[]>('/students')
-
-const selectedStudent = ref(props.studentId)
-
-const studentOptions = computed(() => {
-  return fetchedData.value
-    ? fetchedData.value.map(student => ({
-      label: `${student.firstName} ${student.lastName}`,
-      id: student.id,
-    }))
-    : []
-})
-
-watch(selectedStudent, (newClassId) => {
-  emit('update:student-id', newClassId.id)
+const studentId = defineModel<string>()
+const selectedStudent = ref<StudentRef>(defaultOption)
+watchEffect(() => {
+  studentId.value = selectedStudent.value?.id
 })
 </script>
 
@@ -33,14 +17,17 @@ watch(selectedStudent, (newClassId) => {
     v-slot="{ open }"
     v-model="selectedStudent"
     :options="studentOptions"
-    :ui-menu="{ width: 'w-32', option: { base: 'capitalize' } }"
+    :ui-menu="{ width: 'w-40' }"
     :popper="{ placement: 'bottom-start' }"
+    option-attribute="name"
+    searchable
+    searchable-placeholder="Search a student..."
+    :search-attributes="['name']"
   >
     <UButton
-      :label="selectedStudent?.label || 'Select Student'"
+      :label="selectedStudent?.name || 'Select student'"
       color="gray"
       variant="ghost"
-      class="capitalize"
       :class="[open && 'bg-gray-50 dark:bg-gray-800']"
       trailing-icon="i-heroicons-chevron-down-20-solid"
     />

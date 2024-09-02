@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { sub } from 'date-fns'
-import type { Period, Range } from '~/types'
+import type { Period, Range } from '~/types/api'
 import HomeLeastStudent from '~/components/home/HomeLeastStudent.vue'
 import HomeTopClasses from '~/components/home/HomeTopClasses.vue'
 
 const range = ref<Range>({ start: sub(new Date(), { days: 14 }), end: new Date() })
 const period = ref<Period>('daily')
-const classId = ref<number>(1)
-const studentId = ref<string | null>(null)
+const classId = ref<number>()
+const studentId = ref<string>()
 </script>
 
 <template>
@@ -17,32 +17,14 @@ const studentId = ref<string | null>(null)
 
       <UDashboardToolbar>
         <template #left>
-          <!-- ~/components/home/HomeDateRangePicker.vue -->
-          <HomeDateRangePicker
-            v-model="range"
-            class="-ml-2.5"
-          />
-
-          <!-- ~/components/home/HomePeriodSelect.vue -->
-          <HomePeriodSelect
-            v-model="period"
-            :range="range"
-          />
-
-          <!-- ~/components/home/HomeClassesSelect.vue -->
-          <HomeClassesSelect
-            v-model:class-id="classId"
-          />
-
-          <!-- ~/components/home/HomeStudentsSelect.vue -->
-          <HomeStudentsSelect
-            v-model:student-id="studentId"
-          />
+          <HomeDateRangePicker v-model="range" class="-ml-2.5" />
+          <HomePeriodSelect v-model="period" :range="range" />
+          <HomeClassesSelect v-model="classId" />
+          <HomeStudentsSelect v-model="studentId" />
         </template>
       </UDashboardToolbar>
 
       <UDashboardPanelContent>
-        <!-- ~/components/home/HomeChart.vue -->
         <HomeChart
           :period="period"
           :range="range"
@@ -51,17 +33,17 @@ const studentId = ref<string | null>(null)
         />
 
         <div class="grid lg:grid-cols-2 lg:items-start gap-8 mt-8">
-          <!-- ~/components/home/HomeLeastStudent.vue -->
-          <HomeLeastStudent
-            :period="period"
-            :range="range"
-            :class-id="classId"
-          />
-          <!-- ~/components/home/HomeTopClasses.vue -->
-          <HomeTopClasses
-            :period="period"
-            :range="range"
-          />
+          <ClientOnly>
+            <HomeLeastStudent
+              :period="period"
+              :range="range"
+              :class-id="classId"
+            />
+            <HomeTopClasses
+              :period="period"
+              :range="range"
+            />
+          </ClientOnly>
         </div>
       </UDashboardPanelContent>
     </UDashboardPanel>

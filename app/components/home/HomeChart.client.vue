@@ -1,36 +1,27 @@
 <script setup lang="ts">
 import { eachDayOfInterval, eachMonthOfInterval, eachWeekOfInterval, format, isSameDay } from 'date-fns'
 import { VisArea, VisAxis, VisCrosshair, VisLine, VisTooltip, VisXYContainer } from '@unovis/vue'
-import type { Period, Range } from '~/types'
+import type { Period, Range } from '~/types/api'
 
-const props = defineProps({
-  period: {
-    type: String as PropType<Period>,
-    required: true,
-  },
-  range: {
-    type: Object as PropType<Range>,
-    required: true,
-  },
-  classId: {
-    type: Number as PropType<number>,
-    required: true,
-  },
-  studentId: {
-    type: String as PropType<string>,
-    required: false,
+const props = defineProps<{
+  period: Period
+  range: Range
+  classId?: number
+  studentId?: string
+}>()
+const { classId: schoolClassId, studentId, range } = toRefs(props)
+
+const startDate = computed(() => new Date(range.value.start).toISOString().slice(0, -1))
+const endDate = computed(() => new Date(range.value.end).toISOString().slice(0, -1))
+const { data: fetchedData } = useApi('/presences', {
+  query: {
+    schoolClassId,
+    studentId,
+    start: startDate,
+    end: endDate,
   },
 })
 
-const startDate = computed(() => new Date(props.range.start).toISOString().slice(0, -1))
-const endDate = computed(() => new Date(props.range.end).toISOString().slice(0, -1))
-const { data: fetchedData } = useApi<PresenceViewModel[]>('/presences', {
-  params: computed(() => ({
-    startDate: startDate.value,
-    endDate: endDate.value,
-    classId: props.classId,
-  })),
-})
 const cardRef = ref<HTMLElement | null>(null)
 
 interface DataRecord {
@@ -41,7 +32,9 @@ interface DataRecord {
 const { width } = useElementSize(cardRef)
 
 const { data } = await useAsyncData<DataRecord[]>(async () => {
-  const availableDates = fetchedData.value.map(d => new Date(d.date).toISOString().slice(0, 10))
+  const presences = fetchedData.value
+
+  const availableDates = presences.map(d => new Date(d.date))
   const dates = ({
     daily: eachDayOfInterval,
     weekly: eachWeekOfInterval,
@@ -49,9 +42,9 @@ const { data } = await useAsyncData<DataRecord[]>(async () => {
   })[props.period](props.range)
 
   return dates
-    .filter(date => availableDates.includes(date.toISOString().slice(0, 10)))
+    .filter(date => availableDates.some(d => isSameDay(d, date)))
     .map((date) => {
-      const matchingRecords = fetchedData.value.filter(d => isSameDay(new Date(d.date), date))
+      const matchingRecords = presences.filter(d => isSameDay(new Date(d.date), date))
       if (matchingRecords.length > 0) {
         const presentStudents = matchingRecords.filter(record => record.present).length
         return { date, amount: (presentStudents / matchingRecords.length) * 100 }
@@ -61,7 +54,7 @@ const { data } = await useAsyncData<DataRecord[]>(async () => {
       }
     })
 }, {
-  watch: [() => props.period, () => props.range, () => props.classId, () => props.studentId],
+  watch: [() => props.period, () => props.range, fetchedData],
   default: () => [],
 })
 
@@ -102,7 +95,7 @@ const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amo
           mean presence
         </p>
         <p class="text-3xl text-gray-900 dark:text-white font-semibold">
-          {{ formatNumber(total / data.length) }}
+          {{ data.length ? formatNumber(total / data.length) : '0%' }}
         </p>
       </div>
     </template>

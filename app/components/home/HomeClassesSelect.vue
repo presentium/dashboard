@@ -1,31 +1,14 @@
 <script setup lang="ts">
-import { computed, defineEmits, defineProps, ref, watch } from 'vue'
+import type { SchoolClassViewModel } from '~/types/api'
 
-const props = defineProps({
-  classId: {
-    type: Number as PropType<number>,
-    required: true,
-    default: 1,
-  },
-})
+const { data: schoolClasses } = useApi('/school-classes')
+const defaultOption = { id: undefined, name: 'All classes' }
+const classOptions = computed(() => [defaultOption, ...(schoolClasses?.value ?? [])])
 
-const emit = defineEmits(['update:class-id'])
-
-const { data: fetchedData } = useApi<SchoolClassViewModel[]>('/classes')
-
-const selectedClass = ref(props.classId)
-
-const classOptions = computed(() => {
-  return fetchedData.value
-    ? fetchedData.value.map(schoolClass => ({
-      label: schoolClass.name,
-      id: schoolClass.id,
-    }))
-    : []
-})
-
-watch(selectedClass, (newClassId) => {
-  emit('update:class-id', newClassId.id)
+const classId = defineModel<number>()
+const selectedClass = ref<SchoolClassViewModel>(defaultOption)
+watchEffect(() => {
+  classId.value = selectedClass.value?.id
 })
 </script>
 
@@ -34,14 +17,17 @@ watch(selectedClass, (newClassId) => {
     v-slot="{ open }"
     v-model="selectedClass"
     :options="classOptions"
-    :ui-menu="{ width: 'w-32', option: { base: 'capitalize' } }"
+    :ui-menu="{ width: 'w-32' }"
     :popper="{ placement: 'bottom-start' }"
+    option-attribute="name"
+    searchable
+    searchable-placeholder="Search a class..."
+    :search-attributes="['name']"
   >
     <UButton
-      :label="selectedClass?.label || 'Select Class'"
+      :label="selectedClass?.name || 'Select class'"
       color="gray"
       variant="ghost"
-      class="capitalize"
       :class="[open && 'bg-gray-50 dark:bg-gray-800']"
       trailing-icon="i-heroicons-chevron-down-20-solid"
     />

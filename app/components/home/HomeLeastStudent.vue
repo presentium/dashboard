@@ -1,38 +1,29 @@
 <script setup lang="ts">
-import type { Period, Range } from '~/types'
+import type { Period, Range } from '~/types/api'
 
-const props = defineProps({
-  period: {
-    type: String as PropType<Period>,
-    required: true,
-  },
-  range: {
-    type: Object as PropType<Range>,
-    required: true,
-  },
-  classId: {
-    type: Number as PropType<number>,
-    required: true,
-  },
-})
+const props = defineProps<{
+  period: Period
+  range: Range
+  classId?: number
+}>()
 
-const startDate = computed(() => new Date(props.range.start).toISOString().slice(0, -1))
-const endDate = computed(() => new Date(props.range.end).toISOString().slice(0, -1))
+const { classId: schoolClassId, range } = toRefs(props)
 
-const { data: fetchedData } = useApi<PresenceViewModel[]>('/presences', {
-  params: computed(() => ({
-    startDate: startDate.value,
-    endDate: endDate.value,
-    classId: props.classId,
-  })),
+const startDate = computed(() => new Date(range.value.start).toISOString().slice(0, -1))
+const endDate = computed(() => new Date(range.value.end).toISOString().slice(0, -1))
+
+const { data: fetchedData } = useApi('/presences', {
+  query: {
+    schoolClassId,
+    start: startDate,
+    end: endDate,
+  } as any,
 })
 
 interface StudentPresencePercentage {
   studentId: string
-  firstName: string
-  lastName: string
-  email: string
-  presencePercentage: number
+  name: string
+  presencePercentage: string
 }
 
 const { data } = await useAsyncData<StudentPresencePercentage[]>(async () => {
@@ -63,16 +54,14 @@ const { data } = await useAsyncData<StudentPresencePercentage[]>(async () => {
 
     return {
       studentId,
-      firstName: studentRecord?.student.firstName || '',
-      lastName: studentRecord?.student.lastName || '',
-      email: studentRecord?.student.email || '',
+      name: studentRecord?.student?.name ?? '',
       presencePercentage: presencePercentage.toFixed(1),
     }
   })
 
-  return studentPresencePercentages.sort((a, b) => a.presencePercentage - b.presencePercentage).slice(0, 5)
+  return studentPresencePercentages.sort((a, b) => a.presencePercentage.localeCompare(b.presencePercentage)).slice(0, 5)
 }, {
-  watch: [() => props.period, () => props.range, () => props.classId],
+  watch: [() => props.period, () => props.range, fetchedData],
   default: () => [],
 })
 </script>
@@ -84,23 +73,14 @@ const { data } = await useAsyncData<StudentPresencePercentage[]>(async () => {
     icon="i-heroicons-chart-bar-20-solid"
   >
     <NuxtLink
-      v-for="(student, index) in data"
+      v-for="student in data"
       :key="student.studentId"
       class="px-3 py-2 -mx-2 last:-mb-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer flex items-center gap-3 relative"
     >
-      <UAvatar
-        :alt="`${student.firstName} ${student.lastName}`"
-        :src="`https://i.pravatar.cc/128?u=${index}`"
-        size="md"
-      />
-
       <div class="text-sm flex-1">
         <div>
           <p class="text-gray-900 dark:text-white font-medium">
-            {{ student.firstName }} {{ student.lastName }}
-          </p>
-          <p class="text-gray-500 dark:text-gray-400">
-            {{ student.email }}
+            {{ student.name }}
           </p>
         </div>
       </div>
