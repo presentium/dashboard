@@ -64,9 +64,6 @@ const links = computed((): DashboardSidebarLink[] => {
       }, {
         label: 'Devices',
         to: '/directory/devices',
-      }, {
-        label: 'Presences',
-        to: '/directory/presences',
       }],
     })
   }

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { format, parse } from 'date-fns'
 import { useApi, useRoute } from '#imports'
+import type { PresenceViewModel } from '~/types/api'
 
-const defaultColumns = [{
+const columns = [{
   key: 'student.name',
   label: 'Name',
 }, {
@@ -16,41 +17,41 @@ const defaultColumns = [{
 
 const route = useRoute()
 const toast = useToast()
-const selected = ref<PresenceViewModel[]>([])
-const selectedColumns = ref(defaultColumns)
-const columns = computed(() => defaultColumns.filter(column => selectedColumns.value.includes(column)))
+const { $api } = useNuxtApp()
+
 const sort = ref({ column: 'id', direction: 'asc' as const })
 const q = ref('')
 
-const { data: sessionDates } = useApi('/sessions/dates/{schoolClassId}', {
-  path: { schoolClassId: Number.parseInt(route.params.id as string) },
+const schoolClassId = Number.parseInt(route.params.id as string)
+
+const { data: sessionDates } = useApi('/school-classes/{schoolClassId}/sessions/dates', {
+  path: { schoolClassId },
 })
 
-const selectedDate = ref('')
+const selectedDate = ref()
 
-const { data: presences, status: presenceStatus } = useApi('/presences', {
-  params: computed(() => ({
-    schoolClassId: Number.parseInt(route.params.id as string),
-    start: selectedDate.value,
-    end: selectedDate.value,
-  })),
+const { data: presences, status: presenceStatus } = useAsyncData<PresenceViewModel[]>('presences', async () => {
+  if (!selectedDate.value) {
+    return []
+  }
+
+  return await $api('/presences', {
+    query: {
+      schoolClassId,
+      start: selectedDate.value,
+      end: selectedDate.value,
+    },
+  })
+}, {
+  watch: [selectedDate],
+  default: () => [],
 })
 
 const pending = computed(() => presenceStatus.value === 'pending')
 
-const { data: schoolClass, refresh: classRefresh } = useApi('/school-classes/{schoolClassId}', {
+const { data: schoolClass } = useApi('/school-classes/{schoolClassId}', {
   path: { schoolClassId: Number.parseInt(route.params.id as string) },
 })
-
-function onSelect(row: PresenceViewModel) {
-  const index = selected.value.findIndex(item => item.id === row.id)
-  if (index === -1) {
-    selected.value.push(row)
-  }
-  else {
-    selected.value.splice(index, 1)
-  }
-}
 
 const filteredRows = computed(() => {
   if (!q.value)
@@ -69,9 +70,9 @@ function formatTime(dateTime: string, parseFormat: string, formatted: string): s
 }
 
 function exportCSV(className: string) {
-  const headers = selectedColumns.value.map(column => column.label)
+  const headers = columns.map(column => column.label)
   const rows = filteredRows.value.map((row) => {
-    return selectedColumns.value.map((column) => {
+    return columns.map((column) => {
       // Get the nested value using the column key
       const keys = column.key.split('.')
       let value = row
@@ -88,34 +89,26 @@ function exportCSV(className: string) {
     })
   })
 
-  const csvContent = [headers, ...rows]
-    .map(e => e.join(','))
-    .join('\n')
+  const csvContent = [headers, ...rows].map(e => e.join(',')).join('\n')
+
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   const url = URL.createObjectURL(blob)
   link.setAttribute('href', url)
-  link.setAttribute('download', `presences-${selectedDate.value}-${className}.csv`)
+  link.setAttribute('download', `${selectedDate.value}_${className}_presences.csv`)
   link.style.visibility = 'hidden'
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
   toast.add({ title: 'Presences exported', icon: 'i-heroicons-check-circle' })
 }
-
-watch(selectedDate, () => {
-  classRefresh()
-})
 </script>
 
 <template>
   <UDashboardPage>
     <UDashboardPanel grow>
-      <UDashboardNavbar
-        :title="`Presences of ${schoolClass?.name}`"
-        :badge="presences?.length ?? 'waiting'"
-      />
-      <UDashboardPanelContent class="p-0 pb-24 divide-y divide-gray-200 dark:divide-gray-800">
+      <UDashboardNavbar :title="`Attendance data for class ${schoolClass?.name}`" />
+      <UDashboardPanelContent class="p-0 divide-y divide-gray-200 dark:divide-gray-800">
         <div class="grid grid-cols-3 gap-4 px-4 py-6">
           <div class="text-gray-400 dark:text-gray-500">
             Name
@@ -148,6 +141,23 @@ watch(selectedDate, () => {
         </div>
         <UDashboardToolbar>
           <template #left>
+            <USelectMenu
+              v-model="selectedDate"
+              :options="sessionDates"
+              color="primary"
+              class="min-w-48"
+            >
+              <template #label>
+                <span v-if="selectedDate">{{ formatTime(selectedDate, 'yyyy-MM-dd\'T\'HH:mm:ss', 'dd MMM yyyy \'at\' HH:mm') }}</span>
+                <span v-else class="text-gray-400 dark:text-gray-600">Select a date</span>
+              </template>
+
+              <template #option="{ option }">
+                {{ formatTime(option, 'yyyy-MM-dd\'T\'HH:mm:ss', 'dd MMM yyyy \'at\' HH:mm') }}
+              </template>
+            </USelectMenu>
+          </template>
+          <template #right>
             <UInput
               v-model="q"
               icon="i-heroicons-funnel"
@@ -160,20 +170,12 @@ watch(selectedDate, () => {
                 <UKbd value="/" />
               </template>
             </UInput>
-          </template>
-          <template #right>
-            <!-- Replace HomeDateRangePicker with USelectMenu -->
-            <USelectMenu
-              v-model="selectedDate"
-              :options="sessionDates"
-              placeholder="Select a date"
-              class="-ml-2.5"
-            />
             <UButton
               class="ml-auto"
               color="primary"
               label="Export"
-              trailing-icon="i-heroicons-arrow-up-circle"
+              trailing-icon="i-heroicons-document-chart-bar"
+              :disabled="!selectedDate"
               @click="exportCSV(schoolClass?.name as string)"
             />
           </template>
@@ -186,10 +188,9 @@ watch(selectedDate, () => {
           sort-mode="manual"
           class="w-full"
           :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }"
-          @select="onSelect"
         >
           <template #date-data="{ row }">
-            {{ formatTime(row.date as string, "yyyy-MM-dd'T'HH:mm:ss", 'yyyy-MM-dd') }}
+            {{ formatTime(row.date as string, "yyyy-MM-dd'T'HH:mm:ss", 'dd MMM yyyy') }}
           </template>
           <template #present-data="{ row }">
             <UBadge :label="row.present ? 'Present' : 'Absent'" :color="row.present ? 'green' : 'red'" variant="subtle" />

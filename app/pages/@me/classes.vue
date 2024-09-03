@@ -79,7 +79,12 @@ function formatTime(time: string): string {
         :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }"
       >
         <template #name-data="{ row }">
-          <span class="text-gray-900 dark:text-white font-medium">{{ row.name }}</span>
+          <ULink
+            :to="`/school-classes/${row.id}/presences`"
+            inactive-class="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300"
+          >
+            {{ row.name }}
+          </ULink>
         </template>
 
         <template #teacher-data="{ row }">
