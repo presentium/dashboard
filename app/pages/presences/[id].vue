@@ -15,6 +15,7 @@ const defaultColumns = [{
 }]
 
 const route = useRoute()
+const toast = useToast()
 const selected = ref<PresenceViewModel[]>([])
 const selectedColumns = ref(defaultColumns)
 const columns = computed(() => defaultColumns.filter(column => selectedColumns.value.includes(column)))
@@ -99,6 +100,7 @@ function exportCSV(className: string) {
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+  toast.add({ title: 'Presences exported', icon: 'i-heroicons-check-circle' })
 }
 
 watch(selectedDate, () => {
