@@ -67,8 +67,8 @@ function formatTime(dateTime: string, parseFormat: string, formatted: string): s
   return format(parsedDate, formatted)
 }
 
-function exportCSV() {
-  const headers = selectedColumns.value.map(column => column.label) // Get column labels for CSV header
+function exportCSV(className: string) {
+  const headers = selectedColumns.value.map(column => column.label)
   const rows = filteredRows.value.map((row) => {
     return selectedColumns.value.map((column) => {
       // Get the nested value using the column key
@@ -94,7 +94,7 @@ function exportCSV() {
   const link = document.createElement('a')
   const url = URL.createObjectURL(blob)
   link.setAttribute('href', url)
-  link.setAttribute('download', `presences-${selectedDate.value}-${className.value}.csv`)
+  link.setAttribute('download', `presences-${selectedDate.value}-${className}.csv`)
   link.style.visibility = 'hidden'
   document.body.appendChild(link)
   link.click()
@@ -172,7 +172,7 @@ watch(selectedDate, () => {
               color="primary"
               label="Export"
               trailing-icon="i-heroicons-arrow-up-circle"
-              @click="exportCSV"
+              @click="exportCSV(schoolClass?.name as string)"
             />
           </template>
         </UDashboardToolbar>
