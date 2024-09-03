@@ -64,7 +64,7 @@ function formatTime(time: string): string {
         :title="`Class ${schoolClass?.name}`"
         :loading="pending"
       />
-      <UDashboardPanelContent class="p-0 pb-24 divide-y divide-gray-200 dark:divide-gray-800">
+      <UDashboardPanelContent class="p-0 divide-y divide-gray-200 dark:divide-gray-800">
         <div class="grid grid-cols-3 gap-4 px-4 py-6">
           <div class="text-gray-400 dark:text-gray-500">
             Name
