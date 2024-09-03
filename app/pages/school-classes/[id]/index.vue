@@ -63,7 +63,18 @@ function formatTime(time: string): string {
       <UDashboardNavbar
         :title="`Class ${schoolClass?.name}`"
         :loading="pending"
-      />
+      >
+        <template #right>
+          <UButton
+            label="See presences"
+            icon="i-heroicons-arrow-right-20-solid"
+            variant="link"
+            color="black"
+            :to="`/school-classes/${schoolClass?.id}/presences`"
+            trailing
+          />
+        </template>
+      </UDashboardNavbar>
       <UDashboardPanelContent class="p-0 divide-y divide-gray-200 dark:divide-gray-800">
         <div class="grid grid-cols-3 gap-4 px-4 py-6">
           <div class="text-gray-400 dark:text-gray-500">
