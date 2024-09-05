@@ -16,6 +16,7 @@ export default withNuxt(
       html: true,
       markdown: true,
     },
+    ignores: ['openapi/*'],
   }),
   {
     rules: {
