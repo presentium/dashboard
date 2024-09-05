@@ -23,43 +23,31 @@ const { data: fetchedData } = useApi('/presences', {
 interface StudentPresencePercentage {
   studentId: string
   name: string
-  presencePercentage: string
+  presencePercentage: number
 }
 
 const { data } = await useAsyncData<StudentPresencePercentage[]>(async () => {
-  const studentPresenceMap: Record<string, number> = {}
-  const uniqueDates = new Set<string>()
-
+  const studentPresenceMap: Record<string, { name: string, count: number, total: number }> = {}
   fetchedData.value.forEach((record) => {
-    const student = record.student
-    const studentId = student.id
-    const date = new Date(record.date).toISOString().slice(0, 10)
-
-    uniqueDates.add(date)
-
+    const studentId = record.student.id
+    const studentName = record.student.name
     if (!studentPresenceMap[studentId]) {
-      studentPresenceMap[studentId] = 0
+      studentPresenceMap[studentId] = { count: 0, total: 0, name: studentName }
     }
-
+    studentPresenceMap[studentId].total += 1
     if (record.present) {
-      studentPresenceMap[studentId] += 1
+      studentPresenceMap[studentId].count += 1
     }
   })
 
-  const totalClasses = uniqueDates.size
-
-  const studentPresencePercentages = Object.entries(studentPresenceMap).map(([studentId, presenceCount]) => {
-    const studentRecord = fetchedData.value.find(record => record.student.id === studentId)
-    const presencePercentage = totalClasses > 0 ? (presenceCount / totalClasses) * 100 : 0
-
-    return {
+  return Object.entries(studentPresenceMap)
+    .map(([studentId, data]) => ({
       studentId,
-      name: studentRecord?.student?.name ?? '',
-      presencePercentage: presencePercentage.toFixed(1),
-    }
-  })
-
-  return studentPresencePercentages.sort((a, b) => a.presencePercentage.localeCompare(b.presencePercentage)).slice(0, 5)
+      name: data.name,
+      presencePercentage: (data.count / data.total) * 100,
+    }))
+    .sort((a, b) => a.presencePercentage - b.presencePercentage)
+    .slice(0, 7)
 }, {
   watch: [() => props.period, () => props.range, fetchedData],
   default: () => [],
@@ -86,7 +74,7 @@ const { data } = await useAsyncData<StudentPresencePercentage[]>(async () => {
       </div>
 
       <p class="text-gray-900 dark:text-white font-medium text-lg">
-        {{ student.presencePercentage }}%
+        {{ student.presencePercentage.toFixed(1) }}%
       </p>
     </NuxtLink>
   </UDashboardCard>

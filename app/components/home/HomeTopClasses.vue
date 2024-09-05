@@ -63,16 +63,18 @@ const { data } = await useAsyncData<ClassPresence[]>(async () => {
     description="Classes with the highest number of presences during the selected period"
     icon="i-heroicons-globe-alt-20-solid"
   >
-    <UMeter
-      v-for="classPresence in data"
-      :key="classPresence.classId"
-      :value="classPresence.presenceCount"
-      :label="classPresence.className"
-      :color="classPresence.color"
-      size="lg"
-      class="flex-row-reverse items-center"
-      :ui="{ label: { base: 'flex-shrink-0 w-24' }, indicator: { container: '!w-auto' }, meter: { base: 'flex-1' } }"
-      indicator
-    />
+    <div class="flex flex-col gap-1">
+      <UMeter
+        v-for="classPresence in data"
+        :key="classPresence.classId"
+        :value="classPresence.presenceCount"
+        :label="classPresence.className"
+        :color="classPresence.color"
+        size="lg"
+        class="flex-row-reverse items-center"
+        :ui="{ label: { base: 'flex-shrink-0 w-24' }, indicator: { container: '!w-auto' }, meter: { base: 'flex-1' } }"
+        indicator
+      />
+    </div>
   </UDashboardCard>
 </template>
