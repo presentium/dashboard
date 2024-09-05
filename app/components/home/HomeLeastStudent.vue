@@ -19,8 +19,15 @@ const { data: fetchedData } = useApi('/presences', {
     end: endDate,
   } as any,
 })
-const { data } = await useAsyncData<StudentPresence[]>(async () => {
-  const studentPresenceMap = {}
+
+interface StudentPresencePercentage {
+  studentId: string
+  name: string
+  presencePercentage: number
+}
+
+const { data } = await useAsyncData<StudentPresencePercentage[]>(async () => {
+  const studentPresenceMap: Record<string, { name: string, count: number, total: number }> = {}
   fetchedData.value.forEach((record) => {
     const studentId = record.student.id
     const studentName = record.student.name
@@ -32,12 +39,15 @@ const { data } = await useAsyncData<StudentPresence[]>(async () => {
       studentPresenceMap[studentId].count += 1
     }
   })
-  const studentPresenceList = Object.entries(studentPresenceMap).map(([studentId, data]) => ({
-    studentId,
-    name: data.name,
-    presencePercentage: ((data.count / data.total) * 100).toFixed(2),
-  }))
-  return studentPresenceList.sort((a, b) => a.presencePercentage - b.presencePercentage).slice(0, 10)
+
+  return Object.entries(studentPresenceMap)
+    .map(([studentId, data]) => ({
+      studentId,
+      name: data.name,
+      presencePercentage: (data.count / data.total) * 100,
+    }))
+    .sort((a, b) => a.presencePercentage - b.presencePercentage)
+    .slice(0, 7)
 }, {
   watch: [() => props.period, () => props.range, fetchedData],
   default: () => [],
@@ -64,7 +74,7 @@ const { data } = await useAsyncData<StudentPresence[]>(async () => {
       </div>
 
       <p class="text-gray-900 dark:text-white font-medium text-lg">
-        {{ student.presencePercentage }}%
+        {{ student.presencePercentage.toFixed(1) }}%
       </p>
     </NuxtLink>
   </UDashboardCard>
