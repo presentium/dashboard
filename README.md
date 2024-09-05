@@ -35,16 +35,25 @@ variables that are specific to your local development environment.
 
 Here are a description of the variables you can set. Note that defaults to get you up and running are already provided.
 
-| Variable                           | Description                                                      |
-| ---------------------------------- | ---------------------------------------------------------------- |
-| `NUXT_PUBLIC_SITE_URL`             | The public URL of the application, used for OIDC redirect URI.   |
-| `API_URL`                          | The URL of the API to use. Defaults to `http://localhost:13000`. |
-| `AUTH_OIDC_PROVIDER_AUTHORIZE_URL` | The authorize endpoint of the OIDC provider                      |
-| `AUTH_OIDC_PROVIDER_TOKEN_URL`     | The token endpoint of the OIDC provider                          |
-| `AUTH_OIDC_PROVIDER_USERINFO_URL`  | The userinfo endpoint of the OIDC provider                       |
-| `AUTH_OIDC_PROVIDER_LOGOUT_URL`    | The logout endpoint of the OIDC provider                         |
-| `AUTH_OIDC_PROVIDER_CLIENT_ID`     | The client ID of the OIDC provider                               |
-| `AUTH_OIDC_PROVIDER_CLIENT_SECRET` | The client secret of the OIDC provider                           |
+| Variable                           | Description                                                        |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| `NUXT_PUBLIC_SITE_URL`             | The public URL of the application, used for OIDC redirect URI.     |
+| `API_URL`                          | The URL of the API to use. Defaults to `http://localhost:13000`.   |
+| `AUTH_OIDC_PROVIDER_AUTHORIZE_URL` | The authorize endpoint of the OIDC provider                        |
+| `AUTH_OIDC_PROVIDER_TOKEN_URL`     | The token endpoint of the OIDC provider                            |
+| `AUTH_OIDC_PROVIDER_USERINFO_URL`  | The userinfo endpoint of the OIDC provider                         |
+| `AUTH_OIDC_PROVIDER_LOGOUT_URL`    | The logout endpoint of the OIDC provider                           |
+| `AUTH_OIDC_PROVIDER_ISSUER_URL`    | The jwt signer and issuer URL of the OIDC provider                 |
+| `AUTH_OIDC_PROVIDER_JWKS_URL`      | The jwt key signature endpoint of the OIDC provider                |
+| `AUTH_OIDC_PROVIDER_CLIENT_ID`     | The client ID of the OIDC provider                                 |
+| `AUTH_OIDC_PROVIDER_CLIENT_SECRET` | The client secret of the OIDC provider                             |
+| `NUXT_OIDC_TOKEN_KEY`              | The token encryption key for storing JWT tokens on the server side |
+| `NUXT_OIDC_SESSION_SECRET`         | The HTTP session secret for the user session encryption            |
+| `NUXT_OIDC_AUTH_SESSION_SECRET`    | The oauth session flow encryption key                              |
+
+> [!TIP]
+> In the `.env.example` file we have described in more depth how to configure the variable in
+> your own development environment.
 
 #### Running with the API
 
