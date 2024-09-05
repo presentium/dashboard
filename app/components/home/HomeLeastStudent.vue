@@ -19,47 +19,25 @@ const { data: fetchedData } = useApi('/presences', {
     end: endDate,
   } as any,
 })
-
-interface StudentPresencePercentage {
-  studentId: string
-  name: string
-  presencePercentage: string
-}
-
-const { data } = await useAsyncData<StudentPresencePercentage[]>(async () => {
-  const studentPresenceMap: Record<string, number> = {}
-  const uniqueDates = new Set<string>()
-
+const { data } = await useAsyncData<StudentPresence[]>(async () => {
+  const studentPresenceMap = {}
   fetchedData.value.forEach((record) => {
-    const student = record.student
-    const studentId = student.id
-    const date = new Date(record.date).toISOString().slice(0, 10)
-
-    uniqueDates.add(date)
-
+    const studentId = record.student.id
+    const studentName = record.student.name
     if (!studentPresenceMap[studentId]) {
-      studentPresenceMap[studentId] = 0
+      studentPresenceMap[studentId] = { count: 0, total: 0, name: studentName }
     }
-
+    studentPresenceMap[studentId].total += 1
     if (record.present) {
-      studentPresenceMap[studentId] += 1
+      studentPresenceMap[studentId].count += 1
     }
   })
-
-  const totalClasses = uniqueDates.size
-
-  const studentPresencePercentages = Object.entries(studentPresenceMap).map(([studentId, presenceCount]) => {
-    const studentRecord = fetchedData.value.find(record => record.student.id === studentId)
-    const presencePercentage = totalClasses > 0 ? (presenceCount / totalClasses) * 100 : 0
-
-    return {
-      studentId,
-      name: studentRecord?.student?.name ?? '',
-      presencePercentage: presencePercentage.toFixed(1),
-    }
-  })
-
-  return studentPresencePercentages.sort((a, b) => a.presencePercentage.localeCompare(b.presencePercentage)).slice(0, 5)
+  const studentPresenceList = Object.entries(studentPresenceMap).map(([studentId, data]) => ({
+    studentId,
+    name: data.name,
+    presencePercentage: ((data.count / data.total) * 100).toFixed(2),
+  }))
+  return studentPresenceList.sort((a, b) => a.presencePercentage - b.presencePercentage).slice(0, 10)
 }, {
   watch: [() => props.period, () => props.range, fetchedData],
   default: () => [],
