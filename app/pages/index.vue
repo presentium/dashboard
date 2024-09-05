@@ -8,6 +8,8 @@ const range = ref<Range>({ start: sub(new Date(), { days: 14 }), end: new Date()
 const period = ref<Period>('daily')
 const classId = ref<number>()
 const studentId = ref<string>()
+
+const { teacher } = useRole()
 </script>
 
 <template>
@@ -24,28 +26,50 @@ const studentId = ref<string>()
         </template>
       </UDashboardToolbar>
 
-      <UDashboardPanelContent>
-        <HomeChart
-          :period="period"
-          :range="range"
-          :class-id="classId"
-          :student-id="studentId"
-        />
+      <template v-if="teacher">
+        <UDashboardPanelContent>
+          <HomeChart
+            :period="period"
+            :range="range"
+            :class-id="classId"
+            :student-id="studentId"
+          />
 
-        <div class="grid lg:grid-cols-2 lg:items-start gap-8 mt-8">
-          <ClientOnly>
-            <HomeLeastStudent
+          <div class="grid lg:grid-cols-2 lg:items-start gap-8 mt-8">
+            <ClientOnly>
+              <HomeLeastStudent
+                :period="period"
+                :range="range"
+                :class-id="classId"
+              />
+              <HomeTopClasses
+                :period="period"
+                :range="range"
+              />
+            </ClientOnly>
+          </div>
+        </UDashboardPanelContent>
+      </template>
+      <template v-else>
+        <UDashboardPanelContent class="p-0">
+          <div class="flex flex-col">
+            <HomeStudentChart
               :period="period"
               :range="range"
               :class-id="classId"
+              class="px-6 py-4"
             />
-            <HomeTopClasses
-              :period="period"
-              :range="range"
-            />
-          </ClientOnly>
-        </div>
-      </UDashboardPanelContent>
+
+            <UDivider class="my-4" />
+            <ClientOnly>
+              <HomeStudentTopClasses
+                :period="period"
+                :range="range"
+              />
+            </ClientOnly>
+          </div>
+        </UDashboardPanelContent>
+      </template>
     </UDashboardPanel>
   </UDashboardPage>
 </template>

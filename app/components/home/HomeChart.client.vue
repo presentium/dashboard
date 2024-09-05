@@ -19,7 +19,7 @@ const { data: fetchedData } = useApi('/presences', {
     studentId,
     start: startDate,
     end: endDate,
-  },
+  } as any,
 })
 
 const cardRef = ref<HTMLElement | null>(null)

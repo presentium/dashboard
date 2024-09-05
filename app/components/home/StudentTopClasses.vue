@@ -15,7 +15,7 @@ const colors = ['red', 'orange', 'yellow', 'green', 'teal', 'blue', 'indigo', 'p
 
 const { data: fetchedData } = useApi('/presences', {
   query: {
-    studentId: props.studentId,
+    studentId: '@me',
     start: startDate,
     end: endDate,
   } as any,
@@ -61,9 +61,9 @@ const { data } = await useAsyncData<ClassPresence[]>(async () => {
 
 <template>
   <UDashboardCard
-    title="Top classes"
+    title="Attendance per class"
     description="Classes with the highest number of presences during the selected period"
-    icon="i-heroicons-globe-alt-20-solid"
+    icon="i-heroicons-academic-cap"
     class="no-border no-shadow"
   >
     <UMeter
