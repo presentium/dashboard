@@ -170,8 +170,8 @@ function formatTime(time: string): string {
 
           <UDashboardModal
             v-model="isImportModalOpen"
-            title="Import a schedule"
-            description="Import courses and classes from a calendar file"
+            title="Import a student list"
+            description="Import class students from a list of names"
             :ui="{ width: 'sm:max-w-md' }"
           >
             <UFormGroup label="Student list" description="Include only full names, first name first, one per line">
