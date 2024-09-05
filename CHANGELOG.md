@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v1.0.1
+
+[compare changes](https://github.com/presentium/dashboard/compare/v1.0.0...v1.0.1)
+
+### 🩹 Fixes
+
+- Least student logic ([#12](https://github.com/presentium/dashboard/pull/12))
+
+### 🤖 CI
+
+- Disable linting openapi json ([ae0d957](https://github.com/presentium/dashboard/commit/ae0d957))
+
+### ❤️ Contributors
+
+- Massteff ([@massteff](http://github.com/massteff))
+- Loïc Herman <loic@loicherman.ch>
+
 ## v1.0.0
 
 [compare changes](https://github.com/presentium/dashboard/compare/v0.0.3...v1.0.0)
