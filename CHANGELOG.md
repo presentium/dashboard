@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v1.0.2
+
+[compare changes](https://github.com/presentium/dashboard/compare/v1.0.1...v1.0.2)
+
+### 🩹 Fixes
+
+- Student graph with missing dates ([f731766](https://github.com/presentium/dashboard/commit/f731766))
+
+### 📖 Documentation
+
+- Add remaining variables in README [skip ci] ([753f1f2](https://github.com/presentium/dashboard/commit/753f1f2))
+
+### ❤️ Contributors
+
+- Loïc Herman <loic@loicherman.ch>
+
 ## v1.0.1
 
 [compare changes](https://github.com/presentium/dashboard/compare/v1.0.0...v1.0.1)
