@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { format, isSameDay } from 'date-fns'
+import { eachDayOfInterval, format, isSameDay } from 'date-fns'
 import { VisAxis, VisBulletLegend, VisGroupedBar, VisTooltip, VisXYContainer } from '@unovis/vue'
 import { FitMode, GroupedBar } from '@unovis/ts'
 import type { Period, Range } from '~/types/api'
@@ -47,9 +47,18 @@ const { data } = useAsyncData('filteredAttendanceData', async () => {
       })
     }
     return acc
-  }, [] as Array<{ date: string, present: number, absent: number, presentCourses: string[], absentCourses: string[] }>)
+  }, eachDayOfInterval({
+    start: new Date(startDate.value),
+    end: new Date(endDate.value),
+  }).map(date => ({
+    date: format(date, 'yyyy-MM-dd'),
+    present: 0,
+    absent: 0,
+    presentCourses: [],
+    absentCourses: [],
+  })) as Array<{ date: string, present: number, absent: number, presentCourses: string[], absentCourses: string[] }>)
 }, {
-  watch: [attendanceData],
+  watch: [startDate, endDate, attendanceData],
   default: () => [],
 })
 
@@ -72,22 +81,19 @@ function tooltipTemplate(d: any): string {
     </div>
   `
 }
+
+watchEffect(() => {
+  console.log(data.value)
+})
 </script>
 
 <template>
   <div ref="cardRef">
     <VisBulletLegend :items="['Present', 'Absent'].map(name => ({ name }))" />
-    <VisXYContainer :data="data" :scale-by-domain="true">
-      <VisGroupedBar
-        :x="x" :y="y"
-      />
-      <VisTooltip
-        :triggers="{ [GroupedBar.selectors.bar]: tooltipTemplate }"
-      />
-      <VisAxis
-        type="x"
-        :tick-format="tickFormat"
-      />
+    <VisXYContainer :data="data">
+      <VisGroupedBar :x="x" :y="y" :bar-min-height="0" />
+      <VisTooltip :triggers="{ [GroupedBar.selectors.bar]: tooltipTemplate }" />
+      <VisAxis type="x" :tick-format="tickFormat" />
       <VisAxis
         type="y"
         :tick-format="(val) => `${val}`"
